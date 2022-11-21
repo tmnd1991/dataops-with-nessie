@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue Nov 15 18:31:28 CET 2022:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0184-7c58-8974-0000161b3fd0 
+on database directory /Volumes/repos/nessie-demo/src/metastore_db with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@67424e82 
+Loaded from file:/Volumes/repos/nessie-demo/env/lib/python3.10/site-packages/pyspark/jars/derby-10.14.2.0.jar
+java.vendor=Azul Systems, Inc.
+java.runtime.version=11.0.11+9-LTS
+user.dir=/Volumes/repos/nessie-demo/src
+os.name=Mac OS X
+os.arch=aarch64
+os.version=13.0.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

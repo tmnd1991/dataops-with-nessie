@@ -1,0 +1,11 @@
+python create_table.py 
+nessie branch 'customer_update_2022-11-14'
+python update_data.py customer_update_2022-11-14
+python run_dq.py customer_update_2022-11-14
+nessie merge -f customer_update_2022-11-14
+nessie branch -d customer_update_2022-11-14
+
+nessie branch 'customer_update_2022-11-15'
+python update_wrong_data.py customer_update_2022-11-15
+python run_dq.py customer_update_2022-11-15
+nessie branch -d customer_update_2022-11-15

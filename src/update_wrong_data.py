@@ -1,12 +1,12 @@
 import sys
 from pyspark.sql import SparkSession
-url = "http://localhost:19120/api/v1"
+url = "http://nessie:19120/api/v1"
 full_path_to_warehouse = './data'
 ref = sys.argv[1]
 auth_type = "NONE"
 # here we are assuming NONE authorisation
 spark = SparkSession.builder \
-        .config("spark.jars.packages","org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:0.14.1,org.projectnessie:nessie-spark-extensions-3.3_2.12:0.44.0") \
+        .config("spark.jars.packages","org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:1.0.0,org.projectnessie:nessie-spark-extensions-3.3_2.12:0.50.0") \
         .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions") \
         .config("spark.sql.catalog.nessie.uri", url) \
         .config("spark.sql.catalog.nessie.ref", ref) \

@@ -75,14 +75,14 @@ with DAG(
         retries=0
     )
 
-    merge_branch = SparkSqlOperator(
-        name="merge_branch",
-        task_id="merge_branch",
-        conf=config_string, # requires a string instead of a dict
-        conn_id='spark',
-        dag=dag,
-        sql=f"MERGE BRANCH {ref} INTO main IN nessie",
-        retries=0
-    )
+    # merge_branch = SparkSqlOperator(
+    #     name="merge_branch",
+    #     task_id="merge_branch",
+    #     conf=config_string, # requires a string instead of a dict
+    #     conn_id='spark',
+    #     dag=dag,
+    #     sql=f"MERGE BRANCH {ref} INTO main IN nessie",
+    #     retries=0
+    # )
 
-    create_table >> update_data >> run_dq >> merge_branch
+    create_table >> update_data >> run_dq # >> merge_branch

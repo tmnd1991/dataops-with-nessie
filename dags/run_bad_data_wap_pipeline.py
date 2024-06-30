@@ -71,14 +71,14 @@ with DAG(
         retries=0
     )
 
-    delete_branch = SparkSqlOperator(
-        name="delete_branch",
-        task_id="delete_branch",
-        conf=conf,
-        conn_id='spark',
-        dag=dag,
-        sql=f"DROP BRANCH {ref} IN nessie",
-        retries=0
-    )
+    # delete_branch = SparkSqlOperator(
+    #     name="delete_branch",
+    #     task_id="delete_branch",
+    #     conf=conf,
+    #     conn_id='spark',
+    #     dag=dag,
+    #     sql=f"DROP BRANCH {ref} IN nessie",
+    #     retries=0
+    # )
 
-    create_table >> update_wrong_data >> run_dq >> delete_branch
+    create_table >> update_wrong_data >> run_dq # >> delete_branch

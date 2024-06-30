@@ -1,0 +1,38 @@
+FROM apache/airflow:2.9.2-python3.8
+
+ARG SPARK_VERSION="3.5.1"
+ARG HADOOP_VERSION="3"
+
+COPY airflow-requirements.txt /requirements.txt
+USER root
+RUN echo "deb http://deb.debian.org/debian unstable main non-free contrib" >> /etc/apt/sources.list
+RUN apt-get update \
+  && apt-get install -y openjdk-11-jdk \
+  && apt-get install -y zip \
+  && apt-get autoremove -yqq --purge \
+  && apt-get install -y wget \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-arm64
+RUN export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64
+ENV SPARK_HOME /usr/local/spark
+RUN export SPARK_HOME=/usr/local/spark
+
+# Spark submit binaries and jars (Spark binaries must be the same version of spark cluster)
+RUN cd "/tmp"
+RUN wget --no-verbose "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz"
+RUN tar -xvzf "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz"
+RUN mkdir -p "${SPARK_HOME}/bin"
+RUN mkdir -p "${SPARK_HOME}/assembly/target/scala-2.12/jars"
+RUN cp -a "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}/bin/." "${SPARK_HOME}/bin/"
+RUN cp -a "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}/jars/." "${SPARK_HOME}/assembly/target/scala-2.12/jars/"
+RUN rm "spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz"
+
+
+ENV PATH $PATH:/usr/local/spark/bin
+
+USER airflow
+RUN pip install --upgrade pip
+RUN pip install -r /requirements.txt
+RUN zip ge.zip -r /home/airflow/.local/lib/python3.8/site-packages/great_expectations

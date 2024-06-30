@@ -1,13 +1,13 @@
-import sys
+from datetime import datetime
 from pyspark.sql import SparkSession
+
 url = "http://nessie:19120/api/v1"
-full_path_to_warehouse = './data'
-ref = sys.argv[1]
+full_path_to_warehouse = '/data'
+date = datetime.now()
+ref = "customer_update_" + str(date.year) + str(date.month) + str(date.day)
 auth_type = "NONE"
 # here we are assuming NONE authorisation
 spark = SparkSession.builder \
-        .config("spark.jars.packages","org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:1.0.0,org.projectnessie:nessie-spark-extensions-3.3_2.12:0.50.0") \
-        .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions") \
         .config("spark.sql.catalog.nessie.uri", url) \
         .config("spark.sql.catalog.nessie.ref", ref) \
         .config("spark.sql.catalog.nessie.authentication.type", auth_type) \
@@ -24,7 +24,8 @@ data = [
   ]
 spark.read.table("nessie.customer").show()
 columns = ["id", "name", "surname", "tax_id"]
-df = spark.createDataFrame(data,  columns).createOrReplaceTempView("toBeInserted")
+df = spark.createDataFrame(data,  columns)
+df.createOrReplaceTempView("toBeInserted")
 spark.sql(
     f"""MERGE INTO nessie.`customer@{ref}` t
        USING toBeInserted s

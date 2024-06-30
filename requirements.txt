@@ -1,3 +1,0 @@
-pyspark==3.3.1
-pynessie
-great_expectations

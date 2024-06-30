@@ -9,3 +9,10 @@ Repo of the demo performed at [Subsurface 2023](https://www.dremio.com/subsurfac
 3. on another shell run `./start-shell`
 4. Run the commands that are in the `commands` text file
 5. Have fun 🐉
+
+## Airflow implementation quickstart
+
+1. Build the docker image: `./build-image.sh`
+2. Run `docker compose up`
+3. Access Airflow UI on `localhost:8080`, Spark UI on `localhost:4040`, Nessie UI on `localhost:19120`
+4. Run the WAP_Demo DAG from the UI.

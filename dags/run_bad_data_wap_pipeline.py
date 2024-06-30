@@ -1,7 +1,6 @@
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
-from airflow.operators.python import PythonOperator
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+from airflow.providers.apache.spark.operators.spark_sql import SparkSqlOperator
 from datetime import datetime, timedelta
 
 default_args = {
@@ -14,15 +13,28 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
+# Setup parameters for spark session
+url = "http://nessie:19120/api/v1"
+full_path_to_warehouse = '/data'
+date = datetime.now()
+ref = "customer_update_" + str(date.year) + str(date.month) + str(date.day)
+auth_type = "NONE"
+
 conf = {
         'spark.jars.packages': 'org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2,org.projectnessie.nessie-integrations:nessie-spark-extensions-3.5_2.12:0.80.0',
         'spark.driver.extraJavaOptions': '-Divy.cache.dir=/tmp -Divy.home=/tmp',
         'spark.sql.extensions': 'org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions',
-        'spark.master': 'spark://spark-master:7077'
-        }
+        'spark.master': 'spark://spark-master:7077',
+        'spark.sql.catalog.nessie.uri': url,
+        'spark.sql.catalog.nessie.ref': ref,
+        'spark.sql.catalog.nessie.authentication.type': auth_type,
+        'spark.sql.catalog.nessie.catalog-impl': 'org.apache.iceberg.nessie.NessieCatalog',
+        'spark.sql.catalog.nessie.warehouse': full_path_to_warehouse,
+        'spark.sql.catalog.nessie': 'org.apache.iceberg.spark.SparkCatalog'
+    }
 
 with DAG(
-    dag_id="WAP_Demo",
+    dag_id="WAP_Demo_Fail",
     default_args=default_args,
     description=f"A simple DAG for WAP demo",
     schedule_interval=timedelta(days=1),
@@ -59,6 +71,14 @@ with DAG(
         retries=0
     )
 
+    delete_branch = SparkSqlOperator(
+        name="delete_branch",
+        task_id="delete_branch",
+        conf=conf,
+        conn_id='spark',
+        dag=dag,
+        sql=f"DROP BRANCH {ref} IN nessie",
+        retries=0
+    )
 
-
-    create_table >> update_wrong_data >> run_dq
+    create_table >> update_wrong_data >> run_dq >> delete_branch

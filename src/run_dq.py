@@ -1,23 +1,10 @@
 from great_expectations.dataset import SparkDFDataset
-from datetime import datetime
-
-# Set up a basic spark session
-import sys
 from pyspark.sql import SparkSession
-url = "http://nessie:19120/api/v1"
-full_path_to_warehouse = '/data'
-date = datetime.now()
-ref = "customer_update_" + str(date.year) + str(date.month) + str(date.day)
-auth_type = "NONE"
-# here we are assuming NONE authorisation
-spark = SparkSession.builder \
-        .config("spark.sql.catalog.nessie.uri", url) \
-        .config("spark.sql.catalog.nessie.ref", ref) \
-        .config("spark.sql.catalog.nessie.authentication.type", auth_type) \
-        .config("spark.sql.catalog.nessie.catalog-impl", "org.apache.iceberg.nessie.NessieCatalog") \
-        .config("spark.sql.catalog.nessie.warehouse", full_path_to_warehouse) \
-        .config("spark.sql.catalog.nessie", "org.apache.iceberg.spark.SparkCatalog") \
-        .getOrCreate()
+from sys import argv
+import sys
+
+ref = argv[1]
+spark = SparkSession.builder.getOrCreate()
 
 log4jLogger = spark.sparkContext._jvm.org.apache.log4j
 LOGGER = log4jLogger.LogManager.getLogger(__name__)
